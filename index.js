@@ -1,14 +1,22 @@
 // jsx 经过babel编译后 createElement('ul', {...props}, child1, child2...)
 // 虚拟DOM的结构为: {type: 'ul', props: {...props, children: [child1, child2...]}}
 // createElment的目标是return 虚拟DOM
+// 其中要注意文字节点特殊处理: String -> Object
+
 /* 
 ** @params {String} type
 ** @params {Object} props
-** @params {Object} children
+** @params {Object || String} children 节点为text时类型为String
 **
 */
 function createElement (type, props, ...children) {
-
+  return {
+    type,
+    props: {
+      ...props,
+      children: [...children]
+    }
+  }
 }
 
 
