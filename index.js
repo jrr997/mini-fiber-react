@@ -14,14 +14,22 @@ function createElement (type, props, ...children) {
     type,
     props: {
       ...props,
-      children: [...children]
+      children: children.map(child => typeof child === 'string' ? createTextElement(child) : child)
     }
   }
 }
 
-
-
-
+const TEXT_ELEMENT = 'text_element'
+// 创建文字节点
+function createTextElement(text) {
+  return {
+    type: TEXT_ELEMENT,
+    props: {
+      nodeValue: text,
+      children: []
+    }
+  }
+}
 
 var Zack = {
   createElement
@@ -40,3 +48,37 @@ const jsx =  <ul className="list">
   <li className="item">{data.item1}<i>xxx</i></li>
   <li className="item">{data.item2}</li>
 </ul>;
+
+console.log(jsx);
+
+
+
+// schedule
+let nextFiberReconcileWork = null; // 下一个需要创建fiber的VDOM
+let wipRoot = null;
+function workloop(deadline) {
+  let shouldYield = false
+  while (nextFiberReconcileWork && !shouldYield) {
+    // 为当前节点创建fiber
+    nextFiberReconcileWork = performNextWork(nextFiberReconcileWork) // performwork返回下一个需要处理的节点
+    shouldYield = deadline.timeRemaining() < 1
+  }
+  requestIdleCallback(workLoop);
+}
+requestIdleCallback(workLoop);
+
+function performNextWork(fiber) {
+  // 1.创建fiber
+  reconcile(fiber)
+  // 2.返回下一个需要处理的节点
+  if (fiber.child) {
+    return fiber.child
+  }
+  let next = fiber
+  while (next) {
+    if (next.sibing) {
+      return next.sibing
+    }
+    next = next.return
+  }
+}
