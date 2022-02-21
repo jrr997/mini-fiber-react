@@ -12,7 +12,8 @@
 function createElement(type, props, ...children) {
   return {
     type,
-    props: { ...props,
+    props: {
+      ...props,
       children: children.map(child => typeof child === 'string' ? createTextElement(child) : child)
     }
   };
@@ -124,8 +125,10 @@ function render(element, container) {
   nextFiberReconcileWork = wipRoot;
 } // vdom转fiber，并且创建相应的dom，赋值给fiber.dom
 
-
+let count = 0
+// 顺序：自己、子、兄弟（前序遍历）
 function reconcile(fiber) {
+  console.log('reconcile' + count++ + ': ', fiber);
   if (!fiber.dom) {
     fiber.dom = createDom(fiber);
   }
@@ -206,7 +209,7 @@ function commitRoot() {
   wipRoot = null;
 } // 把fiber对应的DOM插入到父亲的DOM中，递归处理兄弟fiber和子fiber
 
-
+// 数的前序遍历
 function commitWork(fiber) {
   if (!fiber) return;
   console.log(fiber);
